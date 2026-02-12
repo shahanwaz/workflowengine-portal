@@ -6,59 +6,53 @@ interface CanvasConnectionsProps {
   selectedNodeId?: string | null;
 }
 
-const connectionColors: Record<ConnectionType, { stroke: string; label: string }> = {
-  success: { stroke: "hsl(142, 60%, 45%)", label: "hsl(142, 60%, 35%)" },
-  reject: { stroke: "hsl(0, 72%, 51%)", label: "hsl(0, 72%, 41%)" },
-  revert: { stroke: "hsl(38, 92%, 50%)", label: "hsl(38, 82%, 40%)" },
-  draft: { stroke: "hsl(220, 15%, 55%)", label: "hsl(220, 15%, 45%)" },
-  fail: { stroke: "hsl(0, 72%, 51%)", label: "hsl(0, 72%, 41%)" },
-  default: { stroke: "hsl(220, 15%, 55%)", label: "hsl(220, 15%, 45%)" },
+const connectionColors: Record<ConnectionType, string> = {
+  success: "#22c55e",
+  reject: "#ef4444",
+  revert: "#f59e0b",
+  draft: "#94a3b8",
+  fail: "#ef4444",
+  default: "#94a3b8",
 };
 
-export function CanvasConnections({ nodes, connections, selectedNodeId }: CanvasConnectionsProps) {
-  const NODE_W = 180;
-  const NODE_H = 48;
+const NODE_W = 200;
+const NODE_H = 48;
+const CORNER_R = 8;
+const CONNECTOR_PAD = 20; // min distance from node before first bend
 
+export function CanvasConnections({ nodes, connections, selectedNodeId }: CanvasConnectionsProps) {
   const connectedIds = new Set<string>();
   if (selectedNodeId) {
     connections.forEach((c) => {
-      if (c.sourceId === selectedNodeId || c.targetId === selectedNodeId) {
-        connectedIds.add(c.id);
-      }
+      if (c.sourceId === selectedNodeId || c.targetId === selectedNodeId) connectedIds.add(c.id);
     });
   }
 
+  // Index connections per source to offset parallel outputs
+  const sourceOutputIndex = new Map<string, number>();
+  const sourceOutputCount = new Map<string, number>();
+  connections.forEach((c) => {
+    sourceOutputCount.set(c.sourceId, (sourceOutputCount.get(c.sourceId) || 0) + 1);
+  });
+  const sourceCounter = new Map<string, number>();
+
   return (
-    <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ width: "5000px", height: "5000px" }}>
+    <svg className="absolute inset-0 pointer-events-none" style={{ width: "6000px", height: "4000px", overflow: "visible" }}>
       <defs>
-        {/* Arrowheads per color */}
-        {Object.entries(connectionColors).map(([type, { stroke }]) => (
+        {Object.entries(connectionColors).map(([type, color]) => (
           <marker
             key={type}
             id={`arrow-${type}`}
-            markerWidth="12"
+            markerWidth="10"
             markerHeight="8"
-            refX="11"
+            refX="9"
             refY="4"
             orient="auto"
             markerUnits="strokeWidth"
           >
-            <polygon points="0 0, 12 4, 0 8" fill={stroke} />
+            <path d="M 0 1 L 8 4 L 0 7" fill="none" stroke={color} strokeWidth="1.5" strokeLinejoin="round" />
           </marker>
         ))}
-        {/* Glow filter for selected paths */}
-        <filter id="conn-glow" x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur stdDeviation="3" result="blur" />
-          <feMerge>
-            <feMergeNode in="blur" />
-            <feMergeNode in="SourceGraphic" />
-          </feMerge>
-        </filter>
-        {/* Animated dash for flow indication */}
-        <style>{`
-          .flow-path { stroke-dasharray: 8 4; animation: flowDash 1.5s linear infinite; }
-          @keyframes flowDash { to { stroke-dashoffset: -24; } }
-        `}</style>
       </defs>
 
       {connections.map((conn) => {
@@ -67,128 +61,37 @@ export function CanvasConnections({ nodes, connections, selectedNodeId }: Canvas
         if (!source || !target) return null;
 
         const type: ConnectionType = conn.connectionType || "default";
-        const colors = connectionColors[type];
+        const color = connectionColors[type];
         const isHighlighted = connectedIds.has(conn.id);
-        const isDimmed = selectedNodeId && !isHighlighted;
+        const isDimmed = !!selectedNodeId && !isHighlighted;
 
-        // Calculate connection points
-        const isBackward = target.x + NODE_W / 2 < source.x;
-        const isDownward = target.y > source.y + NODE_H;
-        const isUpward = target.y + NODE_H < source.y;
+        // Track output index for this source
+        const idx = sourceCounter.get(conn.sourceId) || 0;
+        sourceCounter.set(conn.sourceId, idx + 1);
+        const totalOutputs = sourceOutputCount.get(conn.sourceId) || 1;
 
-        let d: string;
-
-        if (isBackward) {
-          // Backward: exit left, route above/below, enter left of target
-          const sx = source.x;
-          const sy = source.y + NODE_H / 2;
-          const tx = target.x;
-          const ty = target.y + NODE_H / 2;
-          const loopX = Math.min(sx, tx) - 40;
-          const routeY = Math.min(sy, ty) - 50;
-          d = `M ${sx} ${sy} H ${loopX} V ${routeY} H ${tx + NODE_W / 2} V ${ty} H ${tx}`;
-        } else if (isDownward || isUpward) {
-          // Vertical: exit bottom/top of source, enter top/bottom of target
-          const sx = source.x + NODE_W / 2;
-          const sy = isDownward ? source.y + NODE_H : source.y;
-          const tx = target.x + NODE_W / 2;
-          const ty = isDownward ? target.y : target.y + NODE_H;
-          const midY = (sy + ty) / 2;
-
-          if (Math.abs(sx - tx) < 10) {
-            d = `M ${sx} ${sy} V ${ty}`;
-          } else {
-            d = `M ${sx} ${sy} V ${midY} H ${tx} V ${ty}`;
-          }
-        } else {
-          // Forward horizontal: exit right, enter left
-          const sx = source.x + NODE_W;
-          const sy = source.y + NODE_H / 2;
-          const tx = target.x;
-          const ty = target.y + NODE_H / 2;
-
-          if (Math.abs(ty - sy) < 10) {
-            d = `M ${sx} ${sy} H ${tx}`;
-          } else {
-            const mx = (sx + tx) / 2;
-            d = `M ${sx} ${sy} H ${mx} V ${ty} H ${tx}`;
-          }
-        }
-
-        // Label position (midpoint of path)
-        const labelPos = getPathMidpoint(d);
+        const d = computePath(source, target, idx, totalOutputs, nodes);
 
         return (
-          <g key={conn.id} className="group" style={{ opacity: isDimmed ? 0.25 : 1, transition: "opacity 0.3s" }}>
-            {/* Hover hit area */}
-            <path
-              d={d}
-              stroke="transparent"
-              strokeWidth={16}
-              fill="none"
-              className="pointer-events-auto cursor-pointer"
-            />
-            {/* Highlight glow */}
+          <g key={conn.id} style={{ opacity: isDimmed ? 0.15 : 1, transition: "opacity 0.3s" }}>
+            {/* Hit area */}
+            <path d={d} stroke="transparent" strokeWidth={14} fill="none" className="pointer-events-auto cursor-pointer" />
+            {/* Glow for highlighted */}
             {isHighlighted && (
-              <path
-                d={d}
-                stroke={colors.stroke}
-                strokeWidth={4}
-                fill="none"
-                strokeLinejoin="round"
-                strokeLinecap="round"
-                filter="url(#conn-glow)"
-                opacity={0.4}
-              />
+              <path d={d} stroke={color} strokeWidth={5} fill="none" strokeLinejoin="round" strokeLinecap="round" opacity={0.2} />
             )}
             {/* Main path */}
             <path
               d={d}
-              stroke={colors.stroke}
-              strokeWidth={isHighlighted ? 2.5 : 1.8}
+              stroke={color}
+              strokeWidth={isHighlighted ? 2.2 : 1.6}
               fill="none"
               strokeLinejoin="round"
               strokeLinecap="round"
               markerEnd={`url(#arrow-${type})`}
             />
-            {/* Animated flow overlay on hover */}
-            <path
-              d={d}
-              stroke={colors.stroke}
-              strokeWidth={1.5}
-              fill="none"
-              strokeLinejoin="round"
-              strokeLinecap="round"
-              className="flow-path"
-              opacity={0}
-              style={{ opacity: 0 }}
-            />
             {/* Label */}
-            {conn.label && labelPos && (
-              <g transform={`translate(${labelPos.x}, ${labelPos.y})`}>
-                <rect
-                  x={-conn.label.length * 3.5 - 6}
-                  y={-9}
-                  width={conn.label.length * 7 + 12}
-                  height={18}
-                  rx={4}
-                  fill="hsl(0, 0%, 100%)"
-                  stroke={colors.stroke}
-                  strokeWidth={0.8}
-                  opacity={0.95}
-                />
-                <text
-                  textAnchor="middle"
-                  dominantBaseline="central"
-                  fontSize={10}
-                  fontWeight={500}
-                  fontFamily="Inter, sans-serif"
-                  fill={colors.label}
-                >
-                  {conn.label}
-                </text>
-              </g>
-            )}
+            {conn.label && <ConnectionLabel d={d} label={conn.label} color={color} />}
           </g>
         );
       })}
@@ -196,42 +99,210 @@ export function CanvasConnections({ nodes, connections, selectedNodeId }: Canvas
   );
 }
 
+function computePath(
+  source: WorkflowNode,
+  target: WorkflowNode,
+  outputIndex: number,
+  totalOutputs: number,
+  _allNodes: WorkflowNode[]
+): string {
+  const sCx = source.x + NODE_W / 2;
+  const sCy = source.y + NODE_H / 2;
+  const tCx = target.x + NODE_W / 2;
+  const tCy = target.y + NODE_H / 2;
+
+  const goingRight = tCx > sCx + NODE_W / 2;
+  const goingDown = tCy > sCy + 10;
+  const goingUp = tCy < sCy - 10;
+  const goingLeft = tCx <= sCx - NODE_W / 2;
+  const sameRow = !goingDown && !goingUp;
+
+  // Offset for multiple outputs from same node
+  const spreadTotal = (totalOutputs - 1) * 12;
+  const offsetY = -spreadTotal / 2 + outputIndex * 12;
+
+  if (goingRight && sameRow) {
+    // Simple horizontal: right of source → left of target
+    const sx = source.x + NODE_W;
+    const sy = sCy + offsetY;
+    const tx = target.x;
+    const ty = tCy;
+    if (Math.abs(sy - ty) < 5) {
+      return `M ${sx} ${sy} L ${tx} ${ty}`;
+    }
+    const mx = (sx + tx) / 2;
+    return roundedPath([
+      { x: sx, y: sy }, { x: mx, y: sy }, { x: mx, y: ty }, { x: tx, y: ty }
+    ]);
+  }
+
+  if (goingRight && goingDown) {
+    // Forward + down: exit right or bottom
+    const sx = source.x + NODE_W;
+    const sy = sCy + offsetY;
+    const tx = target.x + NODE_W / 2;
+    const ty = target.y;
+
+    // Route: right, then down to left of target, then right into target
+    const tx2 = target.x;
+    const mx = sx + CONNECTOR_PAD;
+    if (tx2 > mx + 20) {
+      return roundedPath([
+        { x: sx, y: sy }, { x: mx, y: sy }, { x: mx, y: tCy }, { x: tx2, y: tCy }
+      ]);
+    }
+    // go down from bottom of source, then right
+    const sx2 = sCx;
+    const sy2 = source.y + NODE_H;
+    const midY = (sy2 + ty) / 2;
+    return roundedPath([
+      { x: sx2, y: sy2 }, { x: sx2, y: midY }, { x: tx, y: midY }, { x: tx, y: ty }
+    ]);
+  }
+
+  if (goingRight && goingUp) {
+    // Forward + up
+    const sx = source.x + NODE_W;
+    const sy = sCy + offsetY;
+    const tx = target.x;
+    const ty = tCy;
+    const mx = (sx + tx) / 2;
+    return roundedPath([
+      { x: sx, y: sy }, { x: mx, y: sy }, { x: mx, y: ty }, { x: tx, y: ty }
+    ]);
+  }
+
+  if (goingLeft) {
+    // Backward: loop around above or below
+    const sx = source.x; // exit left
+    const sy = sCy + offsetY;
+    const tx = target.x; // enter left
+    const ty = tCy;
+
+    // Route above both nodes
+    const topY = Math.min(source.y, target.y) - 50 - outputIndex * 16;
+    const loopX = Math.min(sx, tx) - 30 - outputIndex * 10;
+
+    return roundedPath([
+      { x: sx, y: sy },
+      { x: loopX, y: sy },
+      { x: loopX, y: topY },
+      { x: tx + NODE_W / 2, y: topY },
+      { x: tx + NODE_W / 2, y: target.y },
+    ]);
+  }
+
+  // Same column, going down
+  if (goingDown) {
+    const sx = sCx + offsetY;
+    const sy = source.y + NODE_H;
+    const tx = tCx;
+    const ty = target.y;
+    if (Math.abs(sx - tx) < 5) {
+      return `M ${sx} ${sy} L ${tx} ${ty}`;
+    }
+    const midY = (sy + ty) / 2;
+    return roundedPath([
+      { x: sx, y: sy }, { x: sx, y: midY }, { x: tx, y: midY }, { x: tx, y: ty }
+    ]);
+  }
+
+  // Same column, going up
+  if (goingUp) {
+    const sx = sCx + offsetY;
+    const sy = source.y;
+    const tx = tCx;
+    const ty = target.y + NODE_H;
+    if (Math.abs(sx - tx) < 5) {
+      return `M ${sx} ${sy} L ${tx} ${ty}`;
+    }
+    const midY = (sy + ty) / 2;
+    return roundedPath([
+      { x: sx, y: sy }, { x: sx, y: midY }, { x: tx, y: midY }, { x: tx, y: ty }
+    ]);
+  }
+
+  // Fallback
+  return `M ${source.x + NODE_W} ${sCy} L ${target.x} ${tCy}`;
+}
+
+/** Build an SVG path through waypoints with rounded corners */
+function roundedPath(pts: { x: number; y: number }[]): string {
+  if (pts.length < 2) return "";
+  if (pts.length === 2) return `M ${pts[0].x} ${pts[0].y} L ${pts[1].x} ${pts[1].y}`;
+
+  let d = `M ${pts[0].x} ${pts[0].y}`;
+
+  for (let i = 1; i < pts.length - 1; i++) {
+    const prev = pts[i - 1];
+    const curr = pts[i];
+    const next = pts[i + 1];
+
+    const d1 = Math.hypot(curr.x - prev.x, curr.y - prev.y);
+    const d2 = Math.hypot(next.x - curr.x, next.y - curr.y);
+    const r = Math.min(CORNER_R, d1 / 2, d2 / 2);
+
+    // Point before corner
+    const ratio1 = r / d1;
+    const bx = curr.x - (curr.x - prev.x) * ratio1;
+    const by = curr.y - (curr.y - prev.y) * ratio1;
+
+    // Point after corner
+    const ratio2 = r / d2;
+    const ax = curr.x + (next.x - curr.x) * ratio2;
+    const ay = curr.y + (next.y - curr.y) * ratio2;
+
+    d += ` L ${bx} ${by} Q ${curr.x} ${curr.y} ${ax} ${ay}`;
+  }
+
+  const last = pts[pts.length - 1];
+  d += ` L ${last.x} ${last.y}`;
+
+  return d;
+}
+
+function ConnectionLabel({ d, label, color }: { d: string; label: string; color: string }) {
+  const pos = getPathMidpoint(d);
+  if (!pos) return null;
+
+  const w = label.length * 6.5 + 16;
+
+  return (
+    <g transform={`translate(${pos.x}, ${pos.y})`}>
+      <rect x={-w / 2} y={-10} width={w} height={20} rx={4} fill="white" stroke={color} strokeWidth={0.7} opacity={0.95} />
+      <text textAnchor="middle" dominantBaseline="central" fontSize={10} fontWeight={500} fontFamily="Inter, sans-serif" fill={color}>
+        {label}
+      </text>
+    </g>
+  );
+}
+
 function getPathMidpoint(d: string): { x: number; y: number } | null {
-  // Parse simple M/H/V/L path commands to find midpoint
-  const cmds = d.match(/[MHVL]\s*-?[\d.]+(?:\s+-?[\d.]+)?/gi);
+  const cmds = d.match(/[MLQC]\s*-?[\d.]+[\s,]-?[\d.]+/gi);
   if (!cmds) return null;
 
   const points: { x: number; y: number }[] = [];
-  let cx = 0, cy = 0;
-
   for (const cmd of cmds) {
-    const type = cmd[0].toUpperCase();
-    const nums = cmd.slice(1).trim().split(/\s+/).map(Number);
-    if (type === "M" || type === "L") {
-      cx = nums[0]; cy = nums[1];
-    } else if (type === "H") {
-      cx = nums[0];
-    } else if (type === "V") {
-      cy = nums[0];
+    const nums = cmd.slice(1).trim().split(/[\s,]+/).map(Number);
+    if (nums.length >= 2) {
+      points.push({ x: nums[nums.length - 2], y: nums[nums.length - 1] });
     }
-    points.push({ x: cx, y: cy });
   }
 
   if (points.length < 2) return null;
 
-  // Get total length and find midpoint
   let totalLen = 0;
-  const segments: { from: typeof points[0]; to: typeof points[0]; len: number }[] = [];
+  const segs: { from: typeof points[0]; to: typeof points[0]; len: number }[] = [];
   for (let i = 1; i < points.length; i++) {
     const len = Math.hypot(points[i].x - points[i - 1].x, points[i].y - points[i - 1].y);
-    segments.push({ from: points[i - 1], to: points[i], len });
+    segs.push({ from: points[i - 1], to: points[i], len });
     totalLen += len;
   }
 
   let target = totalLen / 2;
-  for (const seg of segments) {
-    if (target <= seg.len) {
-      const t = seg.len > 0 ? target / seg.len : 0;
+  for (const seg of segs) {
+    if (target <= seg.len && seg.len > 0) {
+      const t = target / seg.len;
       return {
         x: seg.from.x + (seg.to.x - seg.from.x) * t,
         y: seg.from.y + (seg.to.y - seg.from.y) * t,
@@ -239,6 +310,5 @@ function getPathMidpoint(d: string): { x: number; y: number } | null {
     }
     target -= seg.len;
   }
-
   return points[Math.floor(points.length / 2)];
 }
