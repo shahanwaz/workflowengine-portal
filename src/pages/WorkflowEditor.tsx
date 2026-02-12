@@ -48,8 +48,7 @@ const WorkflowEditor = () => {
       type,
       label: template.label,
       category,
-      x,
-      y,
+      x, y,
       icon: template.icon,
     };
     setNodes((prev) => [...prev, newNode]);
@@ -61,7 +60,7 @@ const WorkflowEditor = () => {
       {/* Editor toolbar */}
       <header className="h-12 border-b border-border bg-card/80 backdrop-blur-sm flex items-center justify-between px-3 z-30 shrink-0">
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => navigate("/")}>
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => navigate(-1)}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div className="h-6 w-6 rounded bg-primary flex items-center justify-center">
@@ -70,25 +69,19 @@ const WorkflowEditor = () => {
           <Input
             value={workflowName}
             onChange={(e) => setWorkflowName(e.target.value)}
-            className="h-7 w-56 text-sm font-medium border-transparent bg-transparent hover:bg-muted focus:bg-card"
+            className="h-7 w-64 text-sm font-medium border-transparent bg-transparent hover:bg-muted focus:bg-card"
           />
         </div>
 
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" className="h-8 w-8">
-            <Undo2 className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8">
-            <Redo2 className="h-4 w-4" />
-          </Button>
+          <Button variant="ghost" size="icon" className="h-8 w-8"><Undo2 className="h-4 w-4" /></Button>
+          <Button variant="ghost" size="icon" className="h-8 w-8"><Redo2 className="h-4 w-4" /></Button>
           <div className="w-px h-5 bg-border mx-1" />
           <Button variant="outline" size="sm" className="h-8 gap-1.5">
-            <Play className="h-3.5 w-3.5" />
-            Test
+            <Play className="h-3.5 w-3.5" /> Test
           </Button>
           <Button size="sm" className="h-8 gap-1.5">
-            <Save className="h-3.5 w-3.5" />
-            Save
+            <Save className="h-3.5 w-3.5" /> Save
           </Button>
         </div>
       </header>
@@ -105,14 +98,16 @@ const WorkflowEditor = () => {
           onAddConnection={handleAddConnection}
           onDropNode={handleDropNode}
         />
-        {selectedNode && (
-          <NodePropertiesPanel
-            node={selectedNode}
-            onUpdate={handleUpdateNode}
-            onClose={() => setSelectedNodeId(null)}
-          />
-        )}
       </div>
+
+      {/* Properties panel as overlay */}
+      {selectedNode && (
+        <NodePropertiesPanel
+          node={selectedNode}
+          onUpdate={handleUpdateNode}
+          onClose={() => setSelectedNodeId(null)}
+        />
+      )}
     </div>
   );
 };
