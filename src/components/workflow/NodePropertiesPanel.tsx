@@ -54,6 +54,9 @@ const levelOptions = [
   { value: "level-3", label: "Level-3" },
   { value: "applicant", label: "Applicant" },
   { value: "no-action", label: "No. Action" },
+  { value: "payment-gateway", label: "Payment Gateway" },
+  { value: "save", label: "Save" },
+  { value: "cert-gen", label: "Cert Gen" },
 ];
 
 export function NodePropertiesPanel({ node, onUpdate, onClose }: NodePropertiesPanelProps) {
