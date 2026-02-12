@@ -3,6 +3,8 @@ import { WorkflowNode, NodeConnection, NodeCategory } from "@/types/workflow";
 import { nodeTemplates } from "@/data/nodeTemplates";
 import { CanvasNode } from "./CanvasNode";
 import { CanvasConnections } from "./CanvasConnections";
+import { ZoomIn, ZoomOut } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface WorkflowCanvasProps {
   nodes: WorkflowNode[];
@@ -24,12 +26,14 @@ export function WorkflowCanvas({
   onDropNode,
 }: WorkflowCanvasProps) {
   const canvasRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
   const [draggingNodeId, setDraggingNodeId] = useState<string | null>(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [connectingFrom, setConnectingFrom] = useState<string | null>(null);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [isPanning, setIsPanning] = useState(false);
   const [panStart, setPanStart] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
 
   const handleCanvasMouseDown = (e: MouseEvent) => {
     if (e.target === canvasRef.current || (e.target as HTMLElement).classList.contains("workflow-grid-bg")) {
@@ -101,42 +105,79 @@ export function WorkflowCanvas({
     }
   };
 
+  const handleZoom = (direction: "in" | "out") => {
+    setZoom((prev) => {
+      const newZoom = direction === "in" ? prev + 0.2 : Math.max(0.4, prev - 0.2);
+      return newZoom;
+    });
+  };
+
   return (
-    <div
-      ref={canvasRef}
-      className="relative flex-1 overflow-hidden bg-canvas workflow-grid-bg cursor-grab active:cursor-grabbing"
-      onMouseDown={handleCanvasMouseDown}
-      onMouseMove={handleCanvasMouseMove}
-      onMouseUp={handleCanvasMouseUp}
-      onMouseLeave={handleCanvasMouseUp}
-      onDrop={handleDrop}
-      onDragOver={(e) => e.preventDefault()}
-    >
+    <div className="relative flex-1 flex flex-col">
       <div
-        style={{ transform: `translate(${pan.x}px, ${pan.y}px)` }}
-        className="absolute inset-0"
+        ref={canvasRef}
+        className="flex-1 overflow-auto bg-canvas workflow-grid-bg cursor-grab active:cursor-grabbing"
+        onMouseDown={handleCanvasMouseDown}
+        onMouseMove={handleCanvasMouseMove}
+        onMouseUp={handleCanvasMouseUp}
+        onMouseLeave={handleCanvasMouseUp}
+        onDrop={handleDrop}
+        onDragOver={(e) => e.preventDefault()}
       >
-        <CanvasConnections nodes={nodes} connections={connections} />
-        {nodes.map((node) => (
-          <CanvasNode
-            key={node.id}
-            node={node}
-            isSelected={selectedNodeId === node.id}
-            onMouseDown={(e) => handleNodeMouseDown(node.id, e)}
-            onConnectorStart={() => handleConnectorStart(node.id)}
-            onConnectorEnd={() => handleConnectorEnd(node.id)}
-          />
-        ))}
+        <div
+          ref={contentRef}
+          style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`, transformOrigin: "0 0" }}
+          className="absolute inset-0"
+        >
+          <CanvasConnections nodes={nodes} connections={connections} />
+          {nodes.map((node) => (
+            <CanvasNode
+              key={node.id}
+              node={node}
+              isSelected={selectedNodeId === node.id}
+              onMouseDown={(e) => handleNodeMouseDown(node.id, e)}
+              onConnectorStart={() => handleConnectorStart(node.id)}
+              onConnectorEnd={() => handleConnectorEnd(node.id)}
+            />
+          ))}
+        </div>
+
+        {nodes.length === 0 && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="text-center text-muted-foreground">
+              <p className="text-lg font-medium">Drag nodes from the sidebar</p>
+              <p className="text-sm mt-1">to start building your workflow</p>
+            </div>
+          </div>
+        )}
       </div>
 
-      {nodes.length === 0 && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="text-center text-muted-foreground">
-            <p className="text-lg font-medium">Drag nodes from the sidebar</p>
-            <p className="text-sm mt-1">to start building your workflow</p>
-          </div>
-        </div>
-      )}
+      {/* Zoom Controls */}
+      <div className="absolute top-3 right-3 flex gap-1 z-20 pointer-events-auto">
+        <Button 
+          variant="outline" 
+          size="icon" 
+          className="h-8 w-8" 
+          onClick={() => handleZoom("in")}
+          title="Zoom In"
+        >
+          <ZoomIn className="h-4 w-4" />
+        </Button>
+        <Button 
+          variant="outline" 
+          size="icon" 
+          className="h-8 w-8" 
+          onClick={() => handleZoom("out")}
+          title="Zoom Out"
+        >
+          <ZoomOut className="h-4 w-4" />
+        </Button>
+      </div>
+
+      {/* Zoom Level Display */}
+      <div className="absolute bottom-12 right-3 text-xs text-muted-foreground bg-card/80 px-2 py-1 rounded border border-border pointer-events-none">
+        {Math.round(zoom * 100)}%
+      </div>
     </div>
   );
 }

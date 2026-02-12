@@ -18,7 +18,7 @@ export function CanvasConnections({ nodes, connections }: CanvasConnectionsProps
           orient="auto"
           markerUnits="strokeWidth"
         >
-          <polygon points="0 0, 10 3.5, 0 7" fill="hsl(var(--canvas-connector))" />
+          <polygon points="0 0, 10 3.5, 0 7" fill="#000000" />
         </marker>
       </defs>
       {connections.map((conn) => {
@@ -31,13 +31,11 @@ export function CanvasConnections({ nodes, connections }: CanvasConnectionsProps
         const tx = target.x;
         const ty = target.y + 22;
 
-        const mx = (sx + tx) / 2;
-
         return (
           <path
             key={conn.id}
-            d={`M ${sx} ${sy} C ${mx} ${sy}, ${mx} ${ty}, ${tx} ${ty}`}
-            stroke="hsl(var(--canvas-connector))"
+            d={`M ${sx} ${sy} L ${tx} ${ty}`}
+            stroke="#000000"
             strokeWidth={2}
             fill="none"
             strokeLinecap="round"
