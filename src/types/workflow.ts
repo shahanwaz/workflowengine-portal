@@ -35,10 +35,14 @@ export interface WorkflowNode {
   icon?: string;
 }
 
+export type ConnectionType = "success" | "reject" | "revert" | "draft" | "fail" | "default";
+
 export interface NodeConnection {
   id: string;
   sourceId: string;
   targetId: string;
+  label?: string;
+  connectionType?: ConnectionType;
 }
 
 export interface NodeTemplate {

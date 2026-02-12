@@ -1,13 +1,22 @@
 import { WorkflowNode, NodeConnection } from "@/types/workflow";
 
 // ER Certification – Mandatory Certification workflow
-// Nodes positioned in a logical flow left-to-right, top-to-bottom
+// Nodes positioned in a structured grid, left-to-right flow
+
+const COL_GAP = 280;
+const ROW_MAIN = 260;
+const ROW_ALT_TOP = 80;
+const ROW_ALT_BOTTOM = 460;
+const ROW_END_BOTTOM = 580;
+const X_START = 60;
+
+const col = (n: number) => X_START + n * COL_GAP;
 
 export const erCertNodes: WorkflowNode[] = [
-  // 1. Form Submission (Applicant)
+  // Column 0: Form Submission
   {
     id: "er-1", type: "form-submission", label: "Form Submission", category: "trigger",
-    x: 80, y: 250, icon: "FileText",
+    x: col(0), y: ROW_MAIN, icon: "FileText",
     config: {
       nodeType: "applicant",
       formJson: "MAND-ER-001",
@@ -18,20 +27,20 @@ export const erCertNodes: WorkflowNode[] = [
     },
   },
 
-  // 2. Draft Save → End
+  // Draft Save branch (below col 0)
   {
     id: "er-ds", type: "draft-save", label: "Draft Save", category: "condition",
-    x: 80, y: 450, icon: "Save",
+    x: col(0), y: ROW_ALT_BOTTOM, icon: "Save",
   },
   {
     id: "er-end-ds", type: "end", label: "End", category: "condition",
-    x: 80, y: 600, icon: "CircleStop",
+    x: col(0), y: ROW_END_BOTTOM, icon: "CircleStop",
   },
 
-  // 3. Approver (Level-1)
+  // Column 1: Approver L1
   {
     id: "er-2", type: "approver", label: "Approver (L1)", category: "trigger",
-    x: 380, y: 250, icon: "UserCheck",
+    x: col(1), y: ROW_MAIN, icon: "UserCheck",
     config: {
       nodeType: "approver",
       actions: [
@@ -41,17 +50,15 @@ export const erCertNodes: WorkflowNode[] = [
       ],
     },
   },
-
-  // 6. End (reject from L1)
   {
     id: "er-end-l1", type: "end", label: "End (Reject L1)", category: "condition",
-    x: 380, y: 450, icon: "CircleStop",
+    x: col(1), y: ROW_ALT_BOTTOM, icon: "CircleStop",
   },
 
-  // 4. Fees Submission
+  // Column 2: Fees Submission
   {
     id: "er-3", type: "fees-submission", label: "Fees Submission", category: "trigger",
-    x: 680, y: 250, icon: "Receipt",
+    x: col(2), y: ROW_MAIN, icon: "Receipt",
     config: {
       nodeType: "applicant",
       actions: [
@@ -60,10 +67,10 @@ export const erCertNodes: WorkflowNode[] = [
     },
   },
 
-  // 7. Payment Gateway
+  // Column 3: Payment Gateway
   {
     id: "er-4", type: "payment-gateway", label: "Payment Gateway", category: "trigger",
-    x: 980, y: 250, icon: "CreditCard",
+    x: col(3), y: ROW_MAIN, icon: "CreditCard",
     config: {
       nodeType: "integration",
       actions: [
@@ -73,10 +80,10 @@ export const erCertNodes: WorkflowNode[] = [
     },
   },
 
-  // 8. Test Report
+  // Column 4: Test Report
   {
     id: "er-5", type: "test-report", label: "Test Report", category: "trigger",
-    x: 1280, y: 250, icon: "ClipboardCheck",
+    x: col(4), y: ROW_MAIN, icon: "ClipboardCheck",
     config: {
       nodeType: "applicant",
       actions: [
@@ -85,10 +92,10 @@ export const erCertNodes: WorkflowNode[] = [
     },
   },
 
-  // 10. Approver (Level-2)
+  // Column 5: Approver L2
   {
     id: "er-6", type: "approver", label: "Approver (L2)", category: "trigger",
-    x: 1580, y: 250, icon: "UserCheck",
+    x: col(5), y: ROW_MAIN, icon: "UserCheck",
     config: {
       nodeType: "approver",
       actions: [
@@ -98,17 +105,15 @@ export const erCertNodes: WorkflowNode[] = [
       ],
     },
   },
-
-  // 13. End (reject from L2)
   {
     id: "er-end-l2", type: "end", label: "End (Reject L2)", category: "condition",
-    x: 1580, y: 450, icon: "CircleStop",
+    x: col(5), y: ROW_ALT_BOTTOM, icon: "CircleStop",
   },
 
-  // 11. Approver (Level-3)
+  // Column 6: Approver L3
   {
     id: "er-7", type: "approver", label: "Approver (L3)", category: "trigger",
-    x: 1880, y: 250, icon: "UserCheck",
+    x: col(6), y: ROW_MAIN, icon: "UserCheck",
     config: {
       nodeType: "approver",
       actions: [
@@ -117,10 +122,10 @@ export const erCertNodes: WorkflowNode[] = [
     },
   },
 
-  // 14. Certificate Manager
+  // Column 7: Certificate Manager
   {
     id: "er-8", type: "cert-manager", label: "Certificate Manager", category: "trigger",
-    x: 2180, y: 250, icon: "Award",
+    x: col(7), y: ROW_MAIN, icon: "Award",
     config: {
       nodeType: "cert-manager",
       actions: [
@@ -132,74 +137,70 @@ export const erCertNodes: WorkflowNode[] = [
     },
   },
 
-  // End (final)
+  // Column 8: End
   {
     id: "er-end-final", type: "end", label: "End (Complete)", category: "condition",
-    x: 2480, y: 250, icon: "CircleStop",
+    x: col(8), y: ROW_MAIN, icon: "CircleStop",
   },
 
   // End (reject from cert manager)
   {
     id: "er-end-cm", type: "end", label: "End (Reject CM)", category: "condition",
-    x: 2180, y: 450, icon: "CircleStop",
+    x: col(7), y: ROW_ALT_BOTTOM, icon: "CircleStop",
   },
 
-  // Go-back labels (visual markers for revert flows)
+  // Go-back nodes (positioned above main row)
   {
     id: "er-gb-l1", type: "go-back", label: "Back to Form", category: "condition",
-    x: 380, y: 100, icon: "Undo2",
+    x: col(1), y: ROW_ALT_TOP, icon: "Undo2",
   },
   {
     id: "er-gb-pay", type: "go-back", label: "Back to Fees", category: "condition",
-    x: 980, y: 450, icon: "Undo2",
+    x: col(3), y: ROW_ALT_BOTTOM, icon: "Undo2",
   },
   {
-    id: "er-gb-test", type: "go-back", label: "Back to Test Report", category: "condition",
-    x: 1580, y: 100, icon: "Undo2",
+    id: "er-gb-test", type: "go-back", label: "Back to Test", category: "condition",
+    x: col(5), y: ROW_ALT_TOP, icon: "Undo2",
   },
   {
-    id: "er-gb-test2", type: "go-back", label: "Back to Test Report", category: "condition",
-    x: 2180, y: 100, icon: "Undo2",
+    id: "er-gb-test2", type: "go-back", label: "Back to Test", category: "condition",
+    x: col(7), y: ROW_ALT_TOP, icon: "Undo2",
   },
 ];
 
 export const erCertConnections: NodeConnection[] = [
-  // Main flow: Form → Approver L1 → Fees → Payment → Test Report → Approver L2 → Approver L3 → Cert Manager → End
-  { id: "ec-1", sourceId: "er-1", targetId: "er-2" },
-  { id: "ec-2", sourceId: "er-2", targetId: "er-3" },
-  { id: "ec-3", sourceId: "er-3", targetId: "er-4" },
-  { id: "ec-4", sourceId: "er-4", targetId: "er-5" },
-  { id: "ec-5", sourceId: "er-5", targetId: "er-6" },
-  { id: "ec-6", sourceId: "er-6", targetId: "er-7" },
-  { id: "ec-7", sourceId: "er-7", targetId: "er-8" },
-  { id: "ec-8", sourceId: "er-8", targetId: "er-end-final" },
+  // Main success flow
+  { id: "ec-1", sourceId: "er-1", targetId: "er-2", label: "Submit", connectionType: "success" },
+  { id: "ec-2", sourceId: "er-2", targetId: "er-3", label: "Approve", connectionType: "success" },
+  { id: "ec-3", sourceId: "er-3", targetId: "er-4", label: "Pay", connectionType: "success" },
+  { id: "ec-4", sourceId: "er-4", targetId: "er-5", label: "Success", connectionType: "success" },
+  { id: "ec-5", sourceId: "er-5", targetId: "er-6", label: "Submit", connectionType: "success" },
+  { id: "ec-6", sourceId: "er-6", targetId: "er-7", label: "Approve", connectionType: "success" },
+  { id: "ec-7", sourceId: "er-7", targetId: "er-8", label: "Approve", connectionType: "success" },
+  { id: "ec-8", sourceId: "er-8", targetId: "er-end-final", label: "Certify", connectionType: "success" },
 
   // Draft Save branch
-  { id: "ec-ds1", sourceId: "er-1", targetId: "er-ds" },
-  { id: "ec-ds2", sourceId: "er-ds", targetId: "er-end-ds" },
+  { id: "ec-ds1", sourceId: "er-1", targetId: "er-ds", label: "Draft", connectionType: "draft" },
+  { id: "ec-ds2", sourceId: "er-ds", targetId: "er-end-ds", connectionType: "draft" },
 
-  // Reject from L1 → End
-  { id: "ec-rej1", sourceId: "er-2", targetId: "er-end-l1" },
+  // Reject paths
+  { id: "ec-rej1", sourceId: "er-2", targetId: "er-end-l1", label: "Reject", connectionType: "reject" },
+  { id: "ec-rej2", sourceId: "er-6", targetId: "er-end-l2", label: "Reject", connectionType: "reject" },
+  { id: "ec-rej3", sourceId: "er-8", targetId: "er-end-cm", label: "Reject", connectionType: "reject" },
 
-  // Revert from L1 → Back to Form
-  { id: "ec-rev1", sourceId: "er-2", targetId: "er-gb-l1" },
-  { id: "ec-rev1b", sourceId: "er-gb-l1", targetId: "er-1" },
+  // Revert paths
+  { id: "ec-rev1", sourceId: "er-2", targetId: "er-gb-l1", label: "Revert", connectionType: "revert" },
+  { id: "ec-rev1b", sourceId: "er-gb-l1", targetId: "er-1", connectionType: "revert" },
 
-  // Payment fail → Back to Fees
-  { id: "ec-fail", sourceId: "er-4", targetId: "er-gb-pay" },
-  { id: "ec-failb", sourceId: "er-gb-pay", targetId: "er-3" },
+  // Payment fail
+  { id: "ec-fail", sourceId: "er-4", targetId: "er-gb-pay", label: "Fail", connectionType: "fail" },
+  { id: "ec-failb", sourceId: "er-gb-pay", targetId: "er-3", connectionType: "fail" },
 
-  // Reject from L2 → End
-  { id: "ec-rej2", sourceId: "er-6", targetId: "er-end-l2" },
+  // Revert from L2
+  { id: "ec-rev2", sourceId: "er-6", targetId: "er-gb-test", label: "Revert", connectionType: "revert" },
+  { id: "ec-rev2b", sourceId: "er-gb-test", targetId: "er-5", connectionType: "revert" },
 
-  // Revert from L2 → Back to Test Report
-  { id: "ec-rev2", sourceId: "er-6", targetId: "er-gb-test" },
-  { id: "ec-rev2b", sourceId: "er-gb-test", targetId: "er-5" },
-
-  // Reject from Cert Manager → End
-  { id: "ec-rej3", sourceId: "er-8", targetId: "er-end-cm" },
-
-  // Revert from Cert Manager → Back to Test Report
-  { id: "ec-rev3", sourceId: "er-8", targetId: "er-gb-test2" },
-  { id: "ec-rev3b", sourceId: "er-gb-test2", targetId: "er-5" },
+  // Revert from Cert Manager
+  { id: "ec-rev3", sourceId: "er-8", targetId: "er-gb-test2", label: "Revert", connectionType: "revert" },
+  { id: "ec-rev3b", sourceId: "er-gb-test2", targetId: "er-5", connectionType: "revert" },
 ];
