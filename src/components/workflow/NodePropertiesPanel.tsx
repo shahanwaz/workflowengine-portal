@@ -42,6 +42,10 @@ const actionOptions = [
   { value: "approve", label: "Approve" },
   { value: "reject", label: "Reject" },
   { value: "revert", label: "Revert" },
+  { value: "submit", label: "Submit" },
+  { value: "draft-save", label: "Draft Save" },
+  { value: "success", label: "Success" },
+  { value: "fail", label: "Fail" },
 ];
 
 const levelOptions = [
