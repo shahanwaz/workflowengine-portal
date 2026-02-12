@@ -1,8 +1,7 @@
 import { nodeTemplates } from "@/data/nodeTemplates";
 import { NodeCategory } from "@/types/workflow";
 import {
-  Webhook, Clock, Mail, Radio, Globe, Send, Database, MessageSquare,
-  Code, Filter, Shuffle, GitBranch, Github, Sheet, CreditCard, Sparkles,
+  Mail, Code,
   FileText, UserCheck, FileOutput, Smartphone,
 } from "lucide-react";
 import { useState } from "react";
@@ -10,8 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 
 const iconMap: Record<string, React.ElementType> = {
-  Webhook, Clock, Mail, Radio, Globe, Send, Database, MessageSquare,
-  Code, Filter, Shuffle, GitBranch, Github, Sheet, CreditCard, Sparkles,
+  Mail, Code,
   FileText, UserCheck, FileOutput, Smartphone,
 };
 
@@ -38,7 +36,7 @@ export function NodeLibrarySidebar() {
       n.description.toLowerCase().includes(search.toLowerCase())
   );
 
-  const grouped = (["trigger", "action", "function", "integration"] as NodeCategory[]).map((cat) => ({
+  const grouped = (["trigger"] as NodeCategory[]).map((cat) => ({
     category: cat,
     nodes: filtered.filter((n) => n.category === cat),
   })).filter((g) => g.nodes.length > 0);
