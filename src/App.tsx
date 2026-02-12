@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
+import ProjectWorkflows from "./pages/ProjectWorkflows";
 import WorkflowEditor from "./pages/WorkflowEditor";
 import NotFound from "./pages/NotFound";
 
@@ -17,6 +18,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Dashboard />} />
+          <Route path="/project/:projectId" element={<ProjectWorkflows />} />
           <Route path="/editor/:id" element={<WorkflowEditor />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -11,6 +11,15 @@ export interface Workflow {
   nodesCount: number;
   executionsToday: number;
   tags: string[];
+  projectId: string;
+}
+
+export interface Project {
+  id: string;
+  name: string;
+  description: string;
+  createdAt: string;
+  owner: string;
 }
 
 export type NodeCategory = "trigger" | "action" | "function" | "integration" | "condition";
