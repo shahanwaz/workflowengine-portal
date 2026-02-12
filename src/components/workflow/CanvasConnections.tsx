@@ -26,24 +26,40 @@ export function CanvasConnections({ nodes, connections }: CanvasConnectionsProps
         const target = nodes.find((n) => n.id === conn.targetId);
         if (!source || !target) return null;
 
-        const sx = source.x + 160;
-        const sy = source.y + 22;
-        const tx = target.x;
-        const ty = target.y + 22;
-
-        // Determine if elbow is needed (when nodes aren't roughly aligned)
-        const dx = Math.abs(tx - sx);
-        const dy = Math.abs(ty - sy);
-        const isAligned = dy < 10; // roughly on same row
+        const nodeWidth = 160;
+        const nodeHeight = 44;
+        const isBackward = target.x + nodeWidth <= source.x + nodeWidth; // target is to the left or same column
 
         let d: string;
-        if (isAligned) {
-          // Straight horizontal line
-          d = `M ${sx} ${sy} L ${tx} ${ty}`;
+
+        if (isBackward) {
+          // "Go back" connection: route from left of source, loop around, arrive at left (start) of target
+          const sx = source.x; // left edge of source
+          const sy = source.y + nodeHeight / 2;
+          const tx = target.x; // left edge (start) of target
+          const ty = target.y + nodeHeight / 2;
+          const offset = 30; // how far the loop extends to the left
+
+          const loopX = Math.min(sx, tx) - offset;
+          const loopTopY = Math.min(sy, ty) - 30;
+
+          d = `M ${sx} ${sy} L ${loopX} ${sy} L ${loopX} ${ty} L ${tx} ${ty}`;
         } else {
-          // Elbow connector: go right to midpoint, then vertical, then horizontal to target
-          const mx = (sx + tx) / 2;
-          d = `M ${sx} ${sy} L ${mx} ${sy} L ${mx} ${ty} L ${tx} ${ty}`;
+          // Forward connection
+          const sx = source.x + nodeWidth;
+          const sy = source.y + nodeHeight / 2;
+          const tx = target.x;
+          const ty = target.y + nodeHeight / 2;
+
+          const dy = Math.abs(ty - sy);
+          const isAligned = dy < 10;
+
+          if (isAligned) {
+            d = `M ${sx} ${sy} L ${tx} ${ty}`;
+          } else {
+            const mx = (sx + tx) / 2;
+            d = `M ${sx} ${sy} L ${mx} ${sy} L ${mx} ${ty} L ${tx} ${ty}`;
+          }
         }
 
         return (
