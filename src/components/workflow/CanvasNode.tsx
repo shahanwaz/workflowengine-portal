@@ -84,11 +84,11 @@ export function CanvasNode({ node, isSelected, isDimmed, onMouseDown, onConnecto
 
       {/* Node body */}
       <div
-        className={`${shapeClass} border-2 px-5 py-3 min-w-[180px] shadow-sm transition-all duration-200 cursor-move
+        className={`${shapeClass} border-2 px-5 py-3 min-w-[200px] shadow-sm transition-all duration-200 cursor-move
           ${baseStyle}
           ${isSelected
             ? "ring-2 ring-primary shadow-lg shadow-primary/20"
-            : "hover:shadow-md hover:scale-[1.02]"
+            : "hover:shadow-md"
           }`}
       >
         <div className="flex items-center gap-3">
