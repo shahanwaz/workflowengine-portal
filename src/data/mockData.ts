@@ -73,11 +73,23 @@ export const mockWorkflows: Workflow[] = [
     executionsToday: 1,
     tags: ["reports", "scheduled"],
   },
+  {
+    id: "er-cert",
+    name: "Mandatory Certification - ER Certification",
+    description: "End-to-end ER certification workflow with multi-level approvals, payment gateway, and certificate generation",
+    status: "active",
+    lastRun: "2026-02-12T06:00:00Z",
+    createdAt: "2026-02-01T09:00:00Z",
+    owner: "Admin",
+    nodesCount: 16,
+    executionsToday: 8,
+    tags: ["certification", "mandatory", "ER"],
+  },
 ];
 
 export const dashboardStats = {
-  totalWorkflows: 6,
-  activeWorkflows: 4,
-  totalExecutionsToday: 189,
+  totalWorkflows: 7,
+  activeWorkflows: 5,
+  totalExecutionsToday: 197,
   errorCount: 1,
 };

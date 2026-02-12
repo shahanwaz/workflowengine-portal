@@ -36,6 +36,8 @@
     --node-function-bg: 38 92% 95%;
     --node-integration: 280 65% 60%;
     --node-integration-bg: 280 65% 95%;
+    --node-condition: 38 92% 50%;
+    --node-condition-bg: 38 92% 95%;
 
     /* Status colors */
     --status-success: 142 60% 45%;
@@ -89,6 +91,8 @@
     --node-function-bg: 38 92% 12%;
     --node-integration: 280 65% 65%;
     --node-integration-bg: 280 65% 12%;
+    --node-condition: 38 92% 55%;
+    --node-condition-bg: 38 92% 12%;
 
     --status-success: 142 60% 50%;
     --status-warning: 38 92% 55%;

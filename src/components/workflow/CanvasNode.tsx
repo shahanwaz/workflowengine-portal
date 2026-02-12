@@ -2,14 +2,16 @@ import { WorkflowNode, NodeCategory } from "@/types/workflow";
 import {
   Webhook, Clock, Mail, Radio, Globe, Send, Database, MessageSquare,
   Code, Filter, Shuffle, GitBranch, Github, Sheet, CreditCard, Sparkles,
-  FileText, UserCheck, FileOutput, Smartphone,
+  FileText, UserCheck, FileOutput, Smartphone, ClipboardCheck, Award, Receipt,
+  GitMerge, Repeat, GitFork, Merge, CircleStop, Save, Undo2,
 } from "lucide-react";
 import { MouseEvent } from "react";
 
 const iconMap: Record<string, React.ElementType> = {
   Webhook, Clock, Mail, Radio, Globe, Send, Database, MessageSquare,
   Code, Filter, Shuffle, GitBranch, Github, Sheet, CreditCard, Sparkles,
-  FileText, UserCheck, FileOutput, Smartphone,
+  FileText, UserCheck, FileOutput, Smartphone, ClipboardCheck, Award, Receipt,
+  GitMerge, Repeat, GitFork, Merge, CircleStop, Save, Undo2,
 };
 
 const categoryStyles: Record<NodeCategory, string> = {
@@ -17,6 +19,7 @@ const categoryStyles: Record<NodeCategory, string> = {
   action: "border-node-action bg-node-action-bg",
   function: "border-node-function bg-node-function-bg",
   integration: "border-node-integration bg-node-integration-bg",
+  condition: "border-node-condition bg-node-condition-bg",
 };
 
 const categoryIconColor: Record<NodeCategory, string> = {
@@ -24,6 +27,7 @@ const categoryIconColor: Record<NodeCategory, string> = {
   action: "text-node-action",
   function: "text-node-function",
   integration: "text-node-integration",
+  condition: "text-node-condition",
 };
 
 interface CanvasNodeProps {

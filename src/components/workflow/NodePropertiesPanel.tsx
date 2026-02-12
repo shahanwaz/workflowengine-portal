@@ -42,6 +42,10 @@ const actionOptions = [
   { value: "approve", label: "Approve" },
   { value: "reject", label: "Reject" },
   { value: "revert", label: "Revert" },
+  { value: "submit", label: "Submit" },
+  { value: "draft-save", label: "Draft Save" },
+  { value: "success", label: "Success" },
+  { value: "fail", label: "Fail" },
 ];
 
 const levelOptions = [
@@ -50,6 +54,9 @@ const levelOptions = [
   { value: "level-3", label: "Level-3" },
   { value: "applicant", label: "Applicant" },
   { value: "no-action", label: "No. Action" },
+  { value: "payment-gateway", label: "Payment Gateway" },
+  { value: "save", label: "Save" },
+  { value: "cert-gen", label: "Cert Gen" },
 ];
 
 export function NodePropertiesPanel({ node, onUpdate, onClose }: NodePropertiesPanelProps) {
@@ -117,7 +124,7 @@ export function NodePropertiesPanel({ node, onUpdate, onClose }: NodePropertiesP
         </div>
 
         <div className="space-y-1.5">
-          <Label className="text-xs text-muted-foreground">Form JSON</Label>
+          <Label className="text-xs text-muted-foreground">Form JSON ID</Label>
           <Input
             value={formJson}
             onChange={(e) => updateConfig("formJson", e.target.value)}

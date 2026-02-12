@@ -8,26 +8,23 @@ import { NodePropertiesPanel } from "@/components/workflow/NodePropertiesPanel";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Save, Play, Undo2, Redo2, Zap } from "lucide-react";
 import { Input } from "@/components/ui/input";
-
-const initialNodes: WorkflowNode[] = [
-  { id: "n1", type: "webhook", label: "Webhook Trigger", category: "trigger", x: 100, y: 200, icon: "Webhook" },
-  { id: "n2", type: "transform", label: "Transform Data", category: "function", x: 380, y: 200, icon: "Shuffle" },
-  { id: "n3", type: "send-email", label: "Send Email", category: "action", x: 660, y: 200, icon: "Send" },
-];
-
-const initialConnections: NodeConnection[] = [
-  { id: "c1", sourceId: "n1", targetId: "n2" },
-  { id: "c2", sourceId: "n2", targetId: "n3" },
-];
+import { erCertNodes, erCertConnections } from "@/data/erCertWorkflow";
 
 const WorkflowEditor = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const isNew = id === "new";
+  const isErCert = id === "er-cert";
 
-  const [workflowName, setWorkflowName] = useState(isNew ? "Untitled Workflow" : "Email Welcome Sequence");
-  const [nodes, setNodes] = useState<WorkflowNode[]>(isNew ? [] : initialNodes);
-  const [connections, setConnections] = useState<NodeConnection[]>(isNew ? [] : initialConnections);
+  const getInitialName = () => {
+    if (isNew) return "Untitled Workflow";
+    if (isErCert) return "Mandatory Certification - ER Certification";
+    return "Email Welcome Sequence";
+  };
+
+  const [workflowName, setWorkflowName] = useState(getInitialName());
+  const [nodes, setNodes] = useState<WorkflowNode[]>(isErCert ? erCertNodes : isNew ? [] : []);
+  const [connections, setConnections] = useState<NodeConnection[]>(isErCert ? erCertConnections : isNew ? [] : []);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
 
   const selectedNode = nodes.find((n) => n.id === selectedNodeId);
