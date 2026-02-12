@@ -2,6 +2,7 @@ import { WorkflowNode, NodeCategory } from "@/types/workflow";
 import {
   Webhook, Clock, Mail, Radio, Globe, Send, Database, MessageSquare,
   Code, Filter, Shuffle, GitBranch, Github, Sheet, CreditCard, Sparkles,
+  FileText, UserCheck, FileOutput, Smartphone,
 } from "lucide-react";
 import { MouseEvent } from "react";
 
