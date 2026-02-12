@@ -77,7 +77,7 @@ const Dashboard = () => {
             <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
               <Zap className="h-4 w-4 text-primary-foreground" />
             </div>
-            <h1 className="text-lg font-semibold">FlowForge</h1>
+            <h1 className="text-lg font-semibold">eTT Work Flow Engine</h1>
           </div>
           <Button onClick={() => setAddOpen(true)} size="sm" className="gap-2">
             <Plus className="h-4 w-4" />
