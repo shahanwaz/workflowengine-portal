@@ -75,15 +75,7 @@ export function NodePropertiesPanel({ node, onUpdate, onClose }: NodePropertiesP
   };
 
   return (
-    <>
-      {/* Backdrop overlay */}
-      <div
-        className="fixed inset-0 bg-background/30 backdrop-blur-[2px] z-40"
-        onClick={onClose}
-      />
-
-      {/* Slide-in panel */}
-      <div className="fixed top-0 right-0 h-full w-96 bg-card border-l border-border shadow-2xl z-50 flex flex-col animate-slide-in-right">
+    <div className="fixed top-12 right-0 h-[calc(100vh-3rem)] w-96 bg-card border-l border-border shadow-2xl z-30 flex flex-col animate-slide-in-right pointer-events-auto">
         <div className="flex items-center justify-between px-5 py-4 border-b border-border">
           <div>
             <h3 className="text-sm font-semibold">Node Properties</h3>
@@ -205,6 +197,5 @@ export function NodePropertiesPanel({ node, onUpdate, onClose }: NodePropertiesP
           </div>
         </div>
       </div>
-    </>
   );
 }
