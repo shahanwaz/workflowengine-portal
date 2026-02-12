@@ -31,13 +31,29 @@ export function CanvasConnections({ nodes, connections }: CanvasConnectionsProps
         const tx = target.x;
         const ty = target.y + 22;
 
+        // Determine if elbow is needed (when nodes aren't roughly aligned)
+        const dx = Math.abs(tx - sx);
+        const dy = Math.abs(ty - sy);
+        const isAligned = dy < 10; // roughly on same row
+
+        let d: string;
+        if (isAligned) {
+          // Straight horizontal line
+          d = `M ${sx} ${sy} L ${tx} ${ty}`;
+        } else {
+          // Elbow connector: go right to midpoint, then vertical, then horizontal to target
+          const mx = (sx + tx) / 2;
+          d = `M ${sx} ${sy} L ${mx} ${sy} L ${mx} ${ty} L ${tx} ${ty}`;
+        }
+
         return (
           <path
             key={conn.id}
-            d={`M ${sx} ${sy} L ${tx} ${ty}`}
+            d={d}
             stroke="#000000"
             strokeWidth={2}
             fill="none"
+            strokeLinejoin="round"
             strokeLinecap="round"
             markerEnd="url(#arrowhead)"
           />
