@@ -2,10 +2,12 @@ import { NodeTemplate } from "@/types/workflow";
 
 export const nodeTemplates: NodeTemplate[] = [
   // Triggers
-  { type: "webhook", label: "Webhook", category: "trigger", description: "Trigger on HTTP request", icon: "Webhook" },
+  { type: "form-submission", label: "Form Submission", category: "trigger", description: "Trigger on form submit", icon: "FileText" },
   { type: "schedule", label: "Schedule", category: "trigger", description: "Run on a cron schedule", icon: "Clock" },
   { type: "email-trigger", label: "Email Received", category: "trigger", description: "Trigger when email arrives", icon: "Mail" },
-  { type: "event", label: "Event Listener", category: "trigger", description: "Listen for system events", icon: "Radio" },
+  { type: "approver", label: "Approver", category: "trigger", description: "Trigger on approval action", icon: "UserCheck" },
+  { type: "pdf-generation", label: "PDF Generation", category: "trigger", description: "Generate PDF documents", icon: "FileOutput" },
+  { type: "sms-trigger", label: "SMS Trigger", category: "trigger", description: "Trigger on SMS received", icon: "Smartphone" },
   
   // Actions
   { type: "http-request", label: "HTTP Request", category: "action", description: "Make an API call", icon: "Globe" },

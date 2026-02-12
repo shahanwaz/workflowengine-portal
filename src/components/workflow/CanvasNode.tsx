@@ -9,6 +9,7 @@ import { MouseEvent } from "react";
 const iconMap: Record<string, React.ElementType> = {
   Webhook, Clock, Mail, Radio, Globe, Send, Database, MessageSquare,
   Code, Filter, Shuffle, GitBranch, Github, Sheet, CreditCard, Sparkles,
+  FileText, UserCheck, FileOutput, Smartphone,
 };
 
 const categoryStyles: Record<NodeCategory, string> = {
