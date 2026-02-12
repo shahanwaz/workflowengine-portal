@@ -3,6 +3,14 @@ import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface NodePropertiesPanelProps {
   node: WorkflowNode;
@@ -17,7 +25,25 @@ const categoryLabel: Record<string, string> = {
   integration: "Integration",
 };
 
+const nodeTypeOptions = [
+  { value: "approver", label: "Approver" },
+  { value: "applicant", label: "Applicant" },
+  { value: "cert-manager", label: "Cert Manager" },
+  { value: "integration", label: "Integration" },
+  { value: "cab", label: "CAB" },
+];
+
 export function NodePropertiesPanel({ node, onUpdate, onClose }: NodePropertiesPanelProps) {
+  const configType = (node.config?.nodeType as string) || "";
+  const formJson = (node.config?.formJson as string) || "";
+  const rule = (node.config?.rule as string) || "";
+
+  const updateConfig = (key: string, value: string) => {
+    onUpdate(node.id, {
+      config: { ...node.config, [key]: value },
+    });
+  };
+
   return (
     <div className="w-72 border-l border-border bg-card flex flex-col h-full">
       <div className="flex items-center justify-between px-4 py-3 border-b border-border">
@@ -39,12 +65,44 @@ export function NodePropertiesPanel({ node, onUpdate, onClose }: NodePropertiesP
 
         <div className="space-y-1.5">
           <Label className="text-xs text-muted-foreground">Type</Label>
-          <div className="text-sm font-mono bg-muted px-3 py-1.5 rounded-md">{node.type}</div>
+          <Select value={configType} onValueChange={(v) => updateConfig("nodeType", v)}>
+            <SelectTrigger className="h-8 text-sm">
+              <SelectValue placeholder="Select type..." />
+            </SelectTrigger>
+            <SelectContent>
+              {nodeTypeOptions.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="space-y-1.5">
           <Label className="text-xs text-muted-foreground">Category</Label>
           <div className="text-sm capitalize bg-muted px-3 py-1.5 rounded-md">{categoryLabel[node.category]}</div>
+        </div>
+
+        <div className="space-y-1.5">
+          <Label className="text-xs text-muted-foreground">Form JSON</Label>
+          <Input
+            value={formJson}
+            onChange={(e) => updateConfig("formJson", e.target.value)}
+            placeholder="https://formio.example.com/form/..."
+            className="h-8 text-sm"
+          />
+          <p className="text-[10px] text-muted-foreground">Link to Form.io platform form definition</p>
+        </div>
+
+        <div className="space-y-1.5">
+          <Label className="text-xs text-muted-foreground">Rule</Label>
+          <Textarea
+            value={rule}
+            onChange={(e) => updateConfig("rule", e.target.value)}
+            placeholder="Define rule logic..."
+            className="text-sm min-h-[80px] resize-y"
+          />
         </div>
 
         <div className="space-y-1.5">
@@ -59,12 +117,6 @@ export function NodePropertiesPanel({ node, onUpdate, onClose }: NodePropertiesP
               <Input value={Math.round(node.y)} readOnly className="h-8 text-sm font-mono" />
             </div>
           </div>
-        </div>
-
-        <div className="pt-4 border-t border-border">
-          <p className="text-xs text-muted-foreground">
-            Configure this node's settings to define its behavior in the workflow.
-          </p>
         </div>
       </div>
     </div>

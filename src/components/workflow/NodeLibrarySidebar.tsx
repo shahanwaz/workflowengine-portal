@@ -3,6 +3,7 @@ import { NodeCategory } from "@/types/workflow";
 import {
   Webhook, Clock, Mail, Radio, Globe, Send, Database, MessageSquare,
   Code, Filter, Shuffle, GitBranch, Github, Sheet, CreditCard, Sparkles,
+  FileText, UserCheck, FileOutput, Smartphone,
 } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
@@ -11,6 +12,7 @@ import { Search } from "lucide-react";
 const iconMap: Record<string, React.ElementType> = {
   Webhook, Clock, Mail, Radio, Globe, Send, Database, MessageSquare,
   Code, Filter, Shuffle, GitBranch, Github, Sheet, CreditCard, Sparkles,
+  FileText, UserCheck, FileOutput, Smartphone,
 };
 
 const categoryLabels: Record<NodeCategory, string> = {
