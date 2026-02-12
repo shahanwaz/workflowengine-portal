@@ -117,7 +117,7 @@ export function NodePropertiesPanel({ node, onUpdate, onClose }: NodePropertiesP
         </div>
 
         <div className="space-y-1.5">
-          <Label className="text-xs text-muted-foreground">Form JSON</Label>
+          <Label className="text-xs text-muted-foreground">Form JSON ID</Label>
           <Input
             value={formJson}
             onChange={(e) => updateConfig("formJson", e.target.value)}

@@ -1,16 +1,18 @@
 import { nodeTemplates } from "@/data/nodeTemplates";
 import { NodeCategory } from "@/types/workflow";
 import {
-  Mail, Code,
-  FileText, UserCheck, FileOutput, Smartphone,
+  Mail, Code, FileText, UserCheck, FileOutput, Smartphone,
+  CreditCard, ClipboardCheck, Award, Receipt,
+  GitBranch, GitMerge, Repeat, GitFork, Merge, CircleStop, Save, Undo2,
 } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 
 const iconMap: Record<string, React.ElementType> = {
-  Mail, Code,
-  FileText, UserCheck, FileOutput, Smartphone,
+  Mail, Code, FileText, UserCheck, FileOutput, Smartphone,
+  CreditCard, ClipboardCheck, Award, Receipt,
+  GitBranch, GitMerge, Repeat, GitFork, Merge, CircleStop, Save, Undo2,
 };
 
 const categoryLabels: Record<NodeCategory, string> = {
@@ -18,6 +20,7 @@ const categoryLabels: Record<NodeCategory, string> = {
   action: "Actions",
   function: "Functions",
   integration: "Integrations",
+  condition: "Conditions",
 };
 
 const categoryDotColor: Record<NodeCategory, string> = {
@@ -25,6 +28,7 @@ const categoryDotColor: Record<NodeCategory, string> = {
   action: "bg-node-action",
   function: "bg-node-function",
   integration: "bg-node-integration",
+  condition: "bg-node-condition",
 };
 
 export function NodeLibrarySidebar() {
@@ -36,7 +40,7 @@ export function NodeLibrarySidebar() {
       n.description.toLowerCase().includes(search.toLowerCase())
   );
 
-  const grouped = (["trigger"] as NodeCategory[]).map((cat) => ({
+  const grouped = (["trigger", "condition"] as NodeCategory[]).map((cat) => ({
     category: cat,
     nodes: filtered.filter((n) => n.category === cat),
   })).filter((g) => g.nodes.length > 0);

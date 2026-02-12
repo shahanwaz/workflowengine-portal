@@ -70,6 +70,8 @@ export default {
           "function-bg": "hsl(var(--node-function-bg))",
           integration: "hsl(var(--node-integration))",
           "integration-bg": "hsl(var(--node-integration-bg))",
+          condition: "hsl(var(--node-condition))",
+          "condition-bg": "hsl(var(--node-condition-bg))",
         },
         status: {
           success: "hsl(var(--status-success))",

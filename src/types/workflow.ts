@@ -13,7 +13,7 @@ export interface Workflow {
   tags: string[];
 }
 
-export type NodeCategory = "trigger" | "action" | "function" | "integration";
+export type NodeCategory = "trigger" | "action" | "function" | "integration" | "condition";
 
 export interface WorkflowNode {
   id: string;

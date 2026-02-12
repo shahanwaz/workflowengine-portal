@@ -8,14 +8,27 @@ interface CanvasConnectionsProps {
 export function CanvasConnections({ nodes, connections }: CanvasConnectionsProps) {
   return (
     <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ width: "5000px", height: "5000px" }}>
+      <defs>
+        <marker
+          id="arrowhead"
+          markerWidth="10"
+          markerHeight="7"
+          refX="9"
+          refY="3.5"
+          orient="auto"
+          markerUnits="strokeWidth"
+        >
+          <polygon points="0 0, 10 3.5, 0 7" fill="hsl(var(--canvas-connector))" />
+        </marker>
+      </defs>
       {connections.map((conn) => {
         const source = nodes.find((n) => n.id === conn.sourceId);
         const target = nodes.find((n) => n.id === conn.targetId);
         if (!source || !target) return null;
 
-        const sx = source.x + 160; // right side of node
-        const sy = source.y + 22;  // vertical center
-        const tx = target.x;       // left side of target
+        const sx = source.x + 160;
+        const sy = source.y + 22;
+        const tx = target.x;
         const ty = target.y + 22;
 
         const mx = (sx + tx) / 2;
@@ -28,6 +41,7 @@ export function CanvasConnections({ nodes, connections }: CanvasConnectionsProps
             strokeWidth={2}
             fill="none"
             strokeLinecap="round"
+            markerEnd="url(#arrowhead)"
           />
         );
       })}
