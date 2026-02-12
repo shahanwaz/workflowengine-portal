@@ -1,78 +1,16 @@
-import { Workflow, WorkflowStatus } from "@/types/workflow";
+import { Workflow, Project } from "@/types/workflow";
+
+export const mockProjects: Project[] = [
+  {
+    id: "proj-mtcte",
+    name: "MTCTE Portal",
+    description: "Mandatory Testing and Certification of Telecom Equipment portal",
+    createdAt: "2026-01-01T09:00:00Z",
+    owner: "Admin",
+  },
+];
 
 export const mockWorkflows: Workflow[] = [
-  {
-    id: "wf-1",
-    name: "Email Welcome Sequence",
-    description: "Sends welcome emails to new users after signup",
-    status: "active",
-    lastRun: "2026-02-11T08:30:00Z",
-    createdAt: "2026-01-15T10:00:00Z",
-    owner: "Sarah Chen",
-    nodesCount: 6,
-    executionsToday: 42,
-    tags: ["email", "onboarding"],
-  },
-  {
-    id: "wf-2",
-    name: "Slack Notification Pipeline",
-    description: "Posts updates to Slack channels based on events",
-    status: "active",
-    lastRun: "2026-02-11T09:15:00Z",
-    createdAt: "2026-01-20T14:30:00Z",
-    owner: "Alex Rivera",
-    nodesCount: 4,
-    executionsToday: 128,
-    tags: ["slack", "notifications"],
-  },
-  {
-    id: "wf-3",
-    name: "Data Sync: CRM to DB",
-    description: "Syncs customer records from CRM to database every hour",
-    status: "error",
-    lastRun: "2026-02-11T07:00:00Z",
-    createdAt: "2026-02-01T09:00:00Z",
-    owner: "Sarah Chen",
-    nodesCount: 8,
-    executionsToday: 3,
-    tags: ["sync", "database"],
-  },
-  {
-    id: "wf-4",
-    name: "Invoice Generator",
-    description: "Generates and sends invoices on the 1st of each month",
-    status: "inactive",
-    lastRun: "2026-02-01T00:00:00Z",
-    createdAt: "2025-12-10T11:00:00Z",
-    owner: "Jordan Lee",
-    nodesCount: 5,
-    executionsToday: 0,
-    tags: ["billing", "scheduled"],
-  },
-  {
-    id: "wf-5",
-    name: "GitHub PR Review Bot",
-    description: "Automatically assigns reviewers and posts review checklists",
-    status: "active",
-    lastRun: "2026-02-11T09:45:00Z",
-    createdAt: "2026-01-25T16:00:00Z",
-    owner: "Alex Rivera",
-    nodesCount: 7,
-    executionsToday: 15,
-    tags: ["github", "automation"],
-  },
-  {
-    id: "wf-6",
-    name: "Weekly Report Aggregator",
-    description: "Collects metrics and generates weekly PDF reports",
-    status: "active",
-    lastRun: "2026-02-10T18:00:00Z",
-    createdAt: "2026-01-05T08:00:00Z",
-    owner: "Jordan Lee",
-    nodesCount: 10,
-    executionsToday: 1,
-    tags: ["reports", "scheduled"],
-  },
   {
     id: "er-cert",
     name: "Mandatory Certification - ER Certification",
@@ -84,12 +22,13 @@ export const mockWorkflows: Workflow[] = [
     nodesCount: 16,
     executionsToday: 8,
     tags: ["certification", "mandatory", "ER"],
+    projectId: "proj-mtcte",
   },
 ];
 
 export const dashboardStats = {
-  totalWorkflows: 7,
-  activeWorkflows: 5,
-  totalExecutionsToday: 197,
-  errorCount: 1,
+  totalWorkflows: 1,
+  activeWorkflows: 1,
+  totalExecutionsToday: 8,
+  errorCount: 0,
 };
