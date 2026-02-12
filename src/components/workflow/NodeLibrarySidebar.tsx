@@ -4,6 +4,7 @@ import {
   Mail, Code, FileText, UserCheck, FileOutput, Smartphone,
   CreditCard, ClipboardCheck, Award, Receipt,
   GitBranch, GitMerge, Repeat, GitFork, Merge, CircleStop, Save, Undo2,
+  Filter, Shuffle, Database, MessageSquare, Send, Webhook, Clock, Radio, Globe, Sheet, Sparkles,
 } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
@@ -13,6 +14,7 @@ const iconMap: Record<string, React.ElementType> = {
   Mail, Code, FileText, UserCheck, FileOutput, Smartphone,
   CreditCard, ClipboardCheck, Award, Receipt,
   GitBranch, GitMerge, Repeat, GitFork, Merge, CircleStop, Save, Undo2,
+  Filter, Shuffle, Database, MessageSquare, Send, Webhook, Clock, Radio, Globe, Sheet, Sparkles,
 };
 
 const categoryLabels: Record<NodeCategory, string> = {
@@ -40,7 +42,7 @@ export function NodeLibrarySidebar() {
       n.description.toLowerCase().includes(search.toLowerCase())
   );
 
-  const grouped = (["trigger", "condition"] as NodeCategory[]).map((cat) => ({
+  const grouped = (["trigger", "action", "function", "integration", "condition"] as NodeCategory[]).map((cat) => ({
     category: cat,
     nodes: filtered.filter((n) => n.category === cat),
   })).filter((g) => g.nodes.length > 0);
